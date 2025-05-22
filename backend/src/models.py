@@ -4,7 +4,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # Konfiguracja
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database_model.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)

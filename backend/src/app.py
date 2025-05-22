@@ -22,7 +22,7 @@ CORS(app, resources={
 app.config['JWT_SECRET_KEY'] = 'your-secret-key-here'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@db:5432/cosmetics'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 @app.before_request
