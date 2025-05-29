@@ -2,11 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Konfiguracja
-app = Flask(__name__)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 # Tabele
 class User(db.Model):
@@ -41,7 +37,7 @@ class Review(db.Model):
     __tablename__ = 'reviews'
     id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Integer, nullable=False)
-    comment = db.Column(db.Text(150), nullable=True)
+    comment = db.Column(db.String(150), nullable=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     cosmetic_id = db.Column(db.Integer, db.ForeignKey('cosmetics.id'), nullable=False)
@@ -51,7 +47,3 @@ class SavedCosmetic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     cosmetic_id = db.Column(db.Integer, db.ForeignKey('cosmetics.id'), nullable=False)
-
-# Inicjalizacja bazy danych
-with app.app_context():
-    db.create_all()

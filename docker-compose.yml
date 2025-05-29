@@ -9,6 +9,9 @@ services:
       - REACT_APP_API_URL=http://backend:5000
     depends_on:
       - backend
+    # volumes:
+    #   - ./frontend:/app
+    #   - /app/node_modules
 
   backend:
     build:
@@ -18,9 +21,11 @@ services:
       - "5000:5000"
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/cosmetics
-      - JWT_SECRET_KEY=your-secret-key-here
+      - JWT_SECRET_KEY=${jwt_secret_key}
     depends_on:
       - db
+    # volumes:
+    #   - ./backend:/app
 
   db:
     image: postgres:15-alpine

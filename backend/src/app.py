@@ -6,24 +6,34 @@ from routes.users import users_bp
 from routes.cosmetics import cosmetics_bp
 from datetime import timedelta
 from logger import get_logger
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+jwt_secret_key=os.getenv("jwt_secret_key")
 
 app = Flask(__name__)
 logger = get_logger()
 
-#to pozwala wysyłać requesty w skrypcie w czytelny sposób
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://127.0.0.1:5500", "http://localhost:5500"],               
+        "origins": ["http://127.0.0.1:3000", "http://localhost:3000"],               
         "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],    
         "allow_headers": ["Content-Type", "Authorization"]
     }
 })
 
-app.config['JWT_SECRET_KEY'] = 'your-secret-key-here'
+app.config['JWT_SECRET_KEY'] = jwt_secret_key
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@db:5432/cosmetics'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+jwt = JWTManager(app)
+
+app.register_blueprint(users_bp)
+app.register_blueprint(cosmetics_bp)
 
 @app.before_request
 def log_request_info():
@@ -39,12 +49,6 @@ def log_exception(error):
     logger.error(f'Error: {str(error)}')
     return 'Internal Server Error', 500
 
-jwt = JWTManager(app)
-db.init_app(app)
-
-app.register_blueprint(users_bp)
-app.register_blueprint(cosmetics_bp)
-
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -54,6 +58,6 @@ def account():
     return render_template('account.html')
 
 if __name__ == '__main__':
-    # with app.app_context():
-    #     db.create_all() 
+    with app.app_context():
+        db.create_all() 
     app.run(debug=True)
