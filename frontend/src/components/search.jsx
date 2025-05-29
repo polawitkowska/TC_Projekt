@@ -1,3 +1,5 @@
+import React from "react";
+
 const token = document.cookie;
 
 //zapisywanie kosmetyku
@@ -83,3 +85,6 @@ const SearchBar = () => {
     </>
   );
 };
+
+export { SaveCosmetic };
+export { SearchBar };

@@ -1,3 +1,5 @@
+import React from "react";
+
 const token = document.cookie;
 const currentUserId = localStorage.getItem("currentUserId");
 
@@ -387,4 +389,12 @@ const ViewReviewsOfCosmetic = ({ cosmetic_id }) => {
       )}
     </>
   );
+};
+
+export {
+  AddReview,
+  EditReview,
+  DeleteReview,
+  ViewReviewsOfUser,
+  ViewReviewsOfCosmetic,
 };

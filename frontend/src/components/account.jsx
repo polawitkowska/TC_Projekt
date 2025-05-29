@@ -1,3 +1,8 @@
+import React from "react";
+import { ViewProfile, Edit, Add } from "./buttons";
+import { ViewReviewsOfUser, ViewReviewsOfCosmetic, AddReview } from "./reviews";
+import { SearchBar } from "./search";
+
 const token = document.cookie;
 const getCurrentId = () => localStorage.getItem("currentUserId");
 const getCurrentEmail = () => localStorage.getItem("currentEmail");
@@ -249,3 +254,6 @@ const Account = ({ cosmetics, error }) => {
     </>
   );
 };
+
+export { EditAccount, DeleteAccount, Logout, RemoveCosmetic };
+export default Account;

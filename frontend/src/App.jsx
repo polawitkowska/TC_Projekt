@@ -1,9 +1,13 @@
-const token = document.cookie;
+import React from "react";
+import "./styles/styles.css";
+import Account from "./components/account";
+import LoginForm from "./components/login";
+
 const getCurrentUser = () => localStorage.getItem("currentUserId");
 
-//logika pobierania zapisanych kosmetyków obecnego użytkownika
 async function fetchCosmetics() {
   try {
+    const token = document.cookie;
     const current_user = getCurrentUser();
     const response = await fetch(
       `http://127.0.0.1:5000/users/${current_user}/saved_cosmetics`,
@@ -25,7 +29,6 @@ async function fetchCosmetics() {
   }
 }
 
-//cała aplikacja
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [cosmetics, setCosmetics] = React.useState([]);
@@ -46,6 +49,4 @@ const App = () => {
   }
 };
 
-//render aplikacji
-const root = ReactDOM.createRoot(document.getElementById("app"));
-root.render(<App />);
+export default App;

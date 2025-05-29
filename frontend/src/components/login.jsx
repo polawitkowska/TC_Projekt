@@ -1,3 +1,5 @@
+import React from "react";
+
 // logika logowania się
 async function login(email, password) {
   try {
@@ -124,3 +126,5 @@ const LoginForm = ({ onLoginSuccess }) => {
     </div>
   );
 };
+
+export default LoginForm;

@@ -1,3 +1,5 @@
+import React from "react";
+
 //przycisk wyświetlania profilu
 const ViewProfile = () => {
   const current_user = localStorage.getItem("currentUserId");
@@ -253,3 +255,5 @@ const Edit = ({ cosmetic_id }) => {
     </>
   );
 };
+
+export { ViewProfile, Add, Edit };
