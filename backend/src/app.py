@@ -8,6 +8,8 @@ from datetime import timedelta
 from logger import get_logger
 import os
 from dotenv import load_dotenv
+import traceback
+import json
 
 load_dotenv()
 jwt_secret_key=os.getenv("jwt_secret_key")
@@ -46,8 +48,9 @@ def log_response_info(response):
 
 @app.errorhandler(Exception)
 def log_exception(error):
-    logger.error(f'Error: {str(error)}')
-    return 'Internal Server Error', 500
+    trace = traceback.format_exc()
+    logger.error(f"Exception occurred: {error}\n{trace}")
+    return json.jsonify({"error": str(error), "trace": trace}), 500
 
 @app.route('/')
 def home():
@@ -60,4 +63,4 @@ def account():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all() 
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

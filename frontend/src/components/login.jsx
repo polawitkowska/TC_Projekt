@@ -36,14 +36,15 @@ async function signup(email, username, password) {
       },
       body: JSON.stringify({ email, username, password }),
     });
-    const data = await response.json();
-    if (response.ok) {
-      //   localStorage.setItem("token", data.access_token);
-      //   localStorage.setItem("currentUserId", data.id);
-      console.log(data);
-      return true;
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Signup failed");
     }
-    return false;
+
+    const data = await response.json();
+    console.log("Server response:", data);
+    return true;
   } catch (error) {
     console.error("Signup error:", error);
     return false;
@@ -57,6 +58,7 @@ const LoginForm = ({ onLoginSuccess }) => {
   const [newEmail, setNewEmail] = React.useState("");
   const [newUsername, setNewUsername] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");
+  const [error, setError] = React.useState("");
 
   async function handleLogIn(e) {
     e.preventDefault();
@@ -68,14 +70,18 @@ const LoginForm = ({ onLoginSuccess }) => {
 
   async function handleSignUp(e) {
     e.preventDefault();
+    setError("");
     const success = await signup(newEmail, newUsername, newPassword);
     if (success) {
       console.log("New account successfully created! You can now log in");
+    } else {
+      setError("Failed to create account. Please try again.");
     }
   }
 
   return (
     <div className="loginPage">
+      {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleLogIn} className="logIn">
         <p className="p">Log in:</p>
         <input
