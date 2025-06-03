@@ -27,7 +27,13 @@ def login():
 
     if user and user.check_password(data['password']):
         access_token = create_access_token(identity=str(user.id))
-        return jsonify({"message": "Login successful", "access_token": access_token, "user": user.username, "id": user.id, "email": user.email}), 200
+        print("access_token:", access_token)
+        print("user.username:", user.username)
+        print("user.id:", user.id)
+        print("user.email:", user.email)
+
+        return jsonify({"message": "Login OK"})
+
     else:
         return jsonify({"message": "Invalid email or password"}), 401
 
