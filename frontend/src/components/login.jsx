@@ -3,13 +3,16 @@ import React from "react";
 // logika logowania się
 async function login(email, password) {
   try {
-    const response = await fetch("http://127.0.0.1:5000/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/users/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      }
+    );
     const data = await response.json();
     if (response.ok) {
       document.cookie = `${data.access_token}`;
@@ -29,7 +32,7 @@ async function login(email, password) {
 //logika zakładania konta
 async function signup(email, username, password) {
   try {
-    const response = await fetch("http://127.0.0.1:5000/users", {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

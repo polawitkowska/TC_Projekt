@@ -13,7 +13,7 @@ const ViewProfile = () => {
   async function fetchUser() {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/users/${current_user}`,
+        `${process.env.REACT_APP_API_URL}/users/${current_user}`,
         { method: "GET" }
       );
 
@@ -88,17 +88,20 @@ const Add = () => {
 
   async function handleSubmit(newBrand, newName, newCategory) {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/cosmetics`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          brand: newBrand,
-          name: newName,
-          category: newCategory,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/cosmetics`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            brand: newBrand,
+            name: newName,
+            category: newCategory,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok) {
@@ -186,7 +189,7 @@ const Edit = ({ cosmetic_id }) => {
   async function handleSubmit(newBrand, newName, newCategory) {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/cosmetics/${cosmetic_id}`,
+        `${process.env.REACT_APP_API_URL}/cosmetics/${cosmetic_id}`,
         {
           method: "PATCH",
           headers: {

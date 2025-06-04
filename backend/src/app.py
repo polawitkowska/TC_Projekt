@@ -17,18 +17,15 @@ jwt_secret_key=os.getenv("jwt_secret_key")
 app = Flask(__name__)
 logger = get_logger()
 
-CORS(app, resources={
-    r"/*": {
-        "origins": ["http://127.0.0.1:3000", "http://localhost:3000"],               
-        "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],    
-        "allow_headers": ["Content-Type", "Authorization"]
-    }
-})
-
+CORS(app,
+     origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+     supports_credentials=True)
+     
 app.config['JWT_SECRET_KEY'] = jwt_secret_key
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@db:5432/cosmetics'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5434/cosmetics'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -51,14 +48,6 @@ def log_exception(error):
     trace = traceback.format_exc()
     logger.error(f"Exception occurred: {error}\n{trace}")
     return json.jsonify({"error": str(error), "trace": trace}), 500
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/account')
-def account():
-    return render_template('account.html')
 
 if __name__ == '__main__':
     with app.app_context():

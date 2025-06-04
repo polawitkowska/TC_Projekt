@@ -28,7 +28,7 @@ const AddReview = ({ cosmetic_id }) => {
   async function handleSubmit(rating, comment) {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/cosmetics/${cosmetic_id}/reviews`,
+        `${process.env.REACT_APP_API_URL}/cosmetics/${cosmetic_id}/reviews`,
         {
           method: "POST",
           headers: {
@@ -109,7 +109,7 @@ const EditReview = ({ review_id }) => {
     async function fetchReview() {
       try {
         const response = await fetch(
-          `http://127.0.0.1:5000/reviews/${review_id}`,
+          `${process.env.REACT_APP_API_URL}/reviews/${review_id}`,
           { method: "GET" }
         );
         const data = await response.json();
@@ -131,7 +131,7 @@ const EditReview = ({ review_id }) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/users/${currentUserId}/reviews/${review_id}`,
+        `${process.env.REACT_APP_API_URL}/users/${currentUserId}/reviews/${review_id}`,
         {
           method: "PATCH",
           headers: {
@@ -195,7 +195,7 @@ const DeleteReview = ({ review_id }) => {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/users/${currentUserId}/reviews/${review_id}`,
+        `${process.env.REACT_APP_API_URL}/users/${currentUserId}/reviews/${review_id}`,
         {
           method: "DELETE",
           headers: {
@@ -234,7 +234,7 @@ const ViewReviewsOfUser = () => {
   async function fetchReviews(user_id) {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/users/${user_id}/reviews`,
+        `${process.env.REACT_APP_API_URL}/users/${user_id}/reviews`,
         { method: "GET" }
       );
 
@@ -255,7 +255,7 @@ const ViewReviewsOfUser = () => {
       const results = await Promise.all(
         passedReviews.map(async (review) => {
           const response = await fetch(
-            `http://127.0.0.1:5000/cosmetics/${review.cosmetic_id}`,
+            `${process.env.REACT_APP_API_URL}/cosmetics/${review.cosmetic_id}`,
             { method: "GET" }
           );
           const cosmetic = await response.json();
@@ -321,7 +321,7 @@ const ViewReviewsOfCosmetic = ({ cosmetic_id }) => {
   async function fetchReviews(cosmetic_id) {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000//cosmetics/${cosmetic_id}/reviews`,
+        `${process.env.REACT_APP_API_URL}//cosmetics/${cosmetic_id}/reviews`,
         { method: "GET" }
       );
 
@@ -342,7 +342,7 @@ const ViewReviewsOfCosmetic = ({ cosmetic_id }) => {
       const results = await Promise.all(
         passedReviews.map(async (review) => {
           const response = await fetch(
-            `http://127.0.0.1:5000/users/${review.user_id}`,
+            `${process.env.REACT_APP_API_URL}/users/${review.user_id}`,
             { method: "GET" }
           );
           const user = await response.json();

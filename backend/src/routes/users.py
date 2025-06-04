@@ -1,8 +1,10 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from models import User, Review, Cosmetic, db
+from flask_cors import CORS
 
 users_bp = Blueprint('users', __name__)
+CORS(users_bp, origins=["http://localhost:3000", "http://127.0.0.1:3000"], supports_credentials=True)
 
 @users_bp.route('/users', methods=['POST'])
 def create_user():
@@ -27,10 +29,6 @@ def login():
 
     if user and user.check_password(data['password']):
         access_token = create_access_token(identity=str(user.id))
-        print("access_token:", access_token)
-        print("user.username:", user.username)
-        print("user.id:", user.id)
-        print("user.email:", user.email)
 
         return jsonify({"message": "Login OK"})
 

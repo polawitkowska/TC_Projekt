@@ -24,7 +24,7 @@ const EditAccount = () => {
   async function handleSubmit(email, username) {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/users/${currentUserId}`,
+        `${process.env.REACT_APP_API_URL}/users/${currentUserId}`,
         {
           method: "PATCH",
           headers: {
@@ -97,7 +97,7 @@ const DeleteAccount = () => {
     const currentUserId = getCurrentId();
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/users/${currentUserId}`,
+        `${process.env.REACT_APP_API_URL}/users/${currentUserId}`,
         {
           method: "DELETE",
           headers: {
@@ -185,7 +185,7 @@ const RemoveCosmetic = ({ cosmetic_id }) => {
   async function handleRemove() {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/users/${currentUserId}/cosmetics/${cosmetic_id}/saved`,
+        `${process.env.REACT_APP_API_URL}/users/${currentUserId}/cosmetics/${cosmetic_id}/saved`,
         {
           method: "DELETE",
           headers: {

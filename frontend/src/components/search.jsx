@@ -7,7 +7,7 @@ const SaveCosmetic = ({ cosmetic_id }) => {
   async function handleAdd() {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/cosmetics/${cosmetic_id}/save`,
+        `${process.env.REACT_APP_API_URL}/cosmetics/${cosmetic_id}/save`,
         {
           method: "POST",
           headers: {
@@ -40,7 +40,7 @@ const SearchBar = () => {
     if (phrase) {
       try {
         const response = await fetch(
-          `http://127.0.0.1:5000/cosmetics/${phrase}`,
+          `${process.env.REACT_APP_API_URL}/cosmetics/${phrase}`,
           {
             method: "GET",
           }
