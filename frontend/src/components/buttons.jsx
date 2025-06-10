@@ -1,14 +1,11 @@
 import React from "react";
+import { Modal } from "./Modal";
 
 //przycisk wyświetlania profilu
 const ViewProfile = () => {
   const current_user = localStorage.getItem("currentUserId");
-  const [isViewing, setIsViewing] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [userData, setUserData] = React.useState({});
-
-  const handleView = () => {
-    setIsViewing(true);
-  };
 
   async function fetchUser() {
     try {
@@ -19,8 +16,7 @@ const ViewProfile = () => {
 
       const data = await response.json();
       if (response.ok) {
-        setIsViewing(true);
-        return data;
+        setUserData(data);
       }
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -28,65 +24,41 @@ const ViewProfile = () => {
   }
 
   React.useEffect(() => {
-    if (isViewing) {
-      fetchUser()
-        .then((data) => setUserData(data))
-        .catch((error) => console.error(error));
+    if (isModalOpen) {
+      fetchUser();
     }
-  }, [isViewing]);
-
-  const handleClose = () => {
-    setIsViewing(false);
-  };
+  }, [isModalOpen]);
 
   return (
     <>
-      {isViewing ? (
-        <div className="accountView">
-          <button className="button" onClick={handleClose}>
-            Schowaj profil
-          </button>
+      <button onClick={() => setIsModalOpen(true)} className="button">
+        Wyświetl profil
+      </button>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Profil użytkownika"
+      >
+        <div className="profile-info">
           <h3 className="h3">Username: {userData.username}</h3>
           <p className="p">E-mail: {userData.email}</p>
           <p className="p">User ID: {userData.id}</p>
         </div>
-      ) : (
-        <button onClick={handleView} className="button">
-          Wyświetl profil
-        </button>
-      )}
+      </Modal>
     </>
   );
 };
 
 //przycisk dodania kosmetyku do bazy danych
 const Add = () => {
-  const [isAdding, setIsAdding] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [brand, setBrand] = React.useState("");
   const [name, setName] = React.useState("");
   const [category, setCategory] = React.useState("");
 
-  function handleAdd() {
-    setIsAdding(true);
-  }
-
-  function handleClose() {
-    setIsAdding(false);
-  }
-
-  const handleBrand = (brand) => {
-    setBrand(brand);
-  };
-
-  const handleName = (name) => {
-    setName(name);
-  };
-
-  const handleCategory = (category) => {
-    setCategory(category);
-  };
-
-  async function handleSubmit(newBrand, newName, newCategory) {
+  async function handleSubmit(e) {
+    e.preventDefault();
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/cosmetics`,
@@ -95,98 +67,74 @@ const Add = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            brand: newBrand,
-            name: newName,
-            category: newCategory,
-          }),
+          body: JSON.stringify({ brand, name, category }),
         }
       );
 
-      const data = await response.json();
       if (response.ok) {
-        console.log(data);
+        setIsModalOpen(false);
         setBrand("");
         setName("");
         setCategory("");
-        setIsAdding(false);
       }
     } catch (error) {
-      console.error("Error adding data:", error);
+      console.error("Error adding cosmetic:", error);
     }
   }
 
   return (
     <>
-      {isAdding ? (
-        <form className="addCosmetic">
-          <button onClick={handleClose} className="button">
-            X
-          </button>
-          <input
-            type="text"
-            placeholder="Podaj markę kosmetyku"
-            onChange={(e) => handleBrand(e.target.value)}
-            className="input"
-          />
-          <input
-            type="text"
-            placeholder="Podaj nazwę kosmetyku"
-            onChange={(e) => handleName(e.target.value)}
-            className="input"
-          />
-          <input
-            type="text"
-            placeholder="Podaj kategorie kosmetyku"
-            onChange={(e) => handleCategory(e.target.value)}
-            className="input"
-          />
+      <button onClick={() => setIsModalOpen(true)} className="button">
+        Dodaj nowy kosmetyk do bazy danych
+      </button>
 
-          <button
-            type="submit"
-            onClick={() => handleSubmit(brand, name, category)}
-            className="button"
-          >
-            Dodaj kosmetyk
-          </button>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Dodaj nowy kosmetyk"
+      >
+        <form className="form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
+            placeholder="Podaj markę kosmetyku"
+            className="input"
+          />
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Podaj nazwę kosmetyku"
+            className="input"
+          />
+          <input
+            type="text"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            placeholder="Podaj kategorię kosmetyku"
+            className="input"
+          />
+          <div className="modal-actions">
+            <button type="submit" className="button">
+              Dodaj kosmetyk
+            </button>
+          </div>
         </form>
-      ) : (
-        <button onClick={handleAdd} className="button">
-          Dodaj nowy kosmetyk do bazy danych
-        </button>
-      )}
+      </Modal>
     </>
   );
 };
 
 //przycisk edytowania informacji o kosmetyku
 const Edit = ({ cosmetic_id }) => {
-  const [isEditing, setIsEditing] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [brand, setBrand] = React.useState("");
   const [name, setName] = React.useState("");
   const [category, setCategory] = React.useState("");
 
-  function handleEdit() {
-    setIsEditing(true);
-  }
-
-  function handleClose() {
-    setIsEditing(false);
-  }
-
-  const handleBrand = (brand) => {
-    setBrand(brand);
-  };
-
-  const handleName = (name) => {
-    setName(name);
-  };
-
-  const handleCategory = (category) => {
-    setCategory(category);
-  };
-
-  async function handleSubmit(newBrand, newName, newCategory) {
+  async function handleSubmit(e) {
+    e.preventDefault();
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/cosmetics/${cosmetic_id}`,
@@ -195,66 +143,59 @@ const Edit = ({ cosmetic_id }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            brand: newBrand,
-            name: newName,
-            category: newCategory,
-          }),
+          body: JSON.stringify({ brand, name, category }),
         }
       );
 
-      const data = await response.json();
       if (response.ok) {
-        console.log(data);
-        setBrand("");
-        setName("");
-        setCategory("");
-        setIsEditing(false);
+        setIsModalOpen(false);
+        window.location.reload();
       }
     } catch (error) {
-      console.error("Error editing data:", error);
+      console.error("Error editing cosmetic:", error);
     }
   }
 
   return (
     <>
-      {isEditing ? (
-        <form
-          className="editCosmetic"
-          onSubmit={() => handleSubmit(brand, name, category)}
-        >
-          <button onClick={handleClose} className="button">
-            X
-          </button>
+      <button onClick={() => setIsModalOpen(true)} className="button">
+        Edytuj kosmetyk
+      </button>
 
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Edytuj kosmetyk"
+      >
+        <form className="form" onSubmit={handleSubmit}>
           <input
             type="text"
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
             placeholder="Podaj nową markę kosmetyku"
-            onChange={(e) => handleBrand(e.target.value)}
             className="input"
           />
           <input
             type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Podaj nową nazwę kosmetyku"
-            onChange={(e) => handleName(e.target.value)}
             className="input"
           />
           <input
             type="text"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
             placeholder="Podaj nową kategorię kosmetyku"
-            onChange={(e) => handleCategory(e.target.value)}
             className="input"
           />
-
-          <button type="submit" className="button">
-            Zapisz zmiany
-          </button>
+          <div className="modal-actions">
+            <button type="submit" className="button">
+              Zapisz zmiany
+            </button>
+          </div>
         </form>
-      ) : (
-        <button onClick={handleEdit} className="button">
-          Edytuj kosmetyk
-        </button>
-      )}
+      </Modal>
     </>
   );
 };

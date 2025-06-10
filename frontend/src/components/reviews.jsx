@@ -1,31 +1,17 @@
 import React from "react";
+import { Modal } from "./Modal";
 
 const token = document.cookie;
 const currentUserId = localStorage.getItem("currentUserId");
 
 //logika dodawania recenzji
 const AddReview = ({ cosmetic_id }) => {
-  const [isAdding, setIsAdding] = React.useState(false);
-  const [newRating, setNewRating] = React.useState(null);
-  const [newComment, setNewComment] = React.useState("");
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [rating, setRating] = React.useState("");
+  const [comment, setComment] = React.useState("");
 
-  const handleAdd = () => {
-    setIsAdding(true);
-  };
-
-  const handleRating = (rating) => {
-    setNewRating(rating);
-  };
-
-  const handleComment = (comment) => {
-    setNewComment(comment);
-  };
-
-  const handleClose = () => {
-    setIsAdding(false);
-  };
-
-  async function handleSubmit(rating, comment) {
+  async function handleSubmit(e) {
+    e.preventDefault();
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/cosmetics/${cosmetic_id}/reviews`,
@@ -35,57 +21,55 @@ const AddReview = ({ cosmetic_id }) => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ rating, comment }),
+          body: JSON.stringify({ rating: Number(rating), comment }),
         }
       );
 
-      const data = await response.json();
       if (response.ok) {
-        console.log(data);
-
-        setNewRating(null);
-        setNewComment("");
-        setIsAdding(false);
+        setIsModalOpen(false);
+        setRating("");
+        setComment("");
       }
     } catch (error) {
       console.error("Error posting review:", error);
     }
   }
+
   return (
     <>
-      {isAdding ? (
-        <form
-          className="newReview"
-          onSubmit={() => handleSubmit(newRating, newComment)}
-        >
-          <button type="button" className="button" onClick={handleClose}>
-            X
-          </button>
+      <button onClick={() => setIsModalOpen(true)} className="button">
+        Dodaj opinię
+      </button>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Dodaj opinię"
+      >
+        <form className="form" onSubmit={handleSubmit}>
           <input
             type="number"
-            name="rating"
+            value={rating}
+            onChange={(e) => setRating(e.target.value)}
             placeholder="Oceń produkt (0-5)"
-            min={0}
-            max={5}
-            onChange={(e) => handleRating(e.target.value)}
+            min="0"
+            max="5"
             className="input"
           />
           <input
             type="text"
-            name="comment"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
             placeholder="Napisz opinię"
-            onChange={(e) => handleComment(e.target.value)}
             className="input"
           />
-          <button type="submit" className="button">
-            Wyślij
-          </button>
+          <div className="modal-actions">
+            <button type="submit" className="button">
+              Dodaj opinię
+            </button>
+          </div>
         </form>
-      ) : (
-        <button className="button" onClick={handleAdd}>
-          Dodaj opinie
-        </button>
-      )}
+      </Modal>
     </>
   );
 };
@@ -224,87 +208,59 @@ const DeleteReview = ({ review_id }) => {
 
 //logika wyświetlania recenzji użytkownika
 const ViewReviewsOfUser = () => {
-  const [isViewing, setIsViewing] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [reviews, setReviews] = React.useState([]);
 
-  const handleView = () => {
-    setIsViewing(true);
-  };
-
-  async function fetchReviews(user_id) {
+  async function fetchReviews() {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/${user_id}/reviews`,
+        `${process.env.REACT_APP_API_URL}/users/${currentUserId}/reviews`,
         { method: "GET" }
       );
 
       const data = await response.json();
-
       if (response.ok) {
-        fetchCosmetic(data)
-          .then((fetchedReview) => setReviews(fetchedReview))
-          .catch((error) => console.error(error));
+        const reviewsWithCosmetics = await fetchCosmetic(data);
+        setReviews(reviewsWithCosmetics);
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
     }
   }
 
-  async function fetchCosmetic(passedReviews) {
-    try {
-      const results = await Promise.all(
-        passedReviews.map(async (review) => {
-          const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/cosmetics/${review.cosmetic_id}`,
-            { method: "GET" }
-          );
-          const cosmetic = await response.json();
-          return { cosmetic, review };
-        })
-      );
-      return results;
-    } catch (error) {
-      console.error("Error fetching cosmetic:", error);
-    }
-  }
-
-  const handleClose = () => {
-    setIsViewing(false);
-  };
-
   React.useEffect(() => {
-    const user_id = localStorage.getItem("currentUserId");
-    if (isViewing) {
-      fetchReviews(user_id);
+    if (isModalOpen) {
+      fetchReviews();
     }
-  }, [isViewing]);
+  }, [isModalOpen]);
 
   return (
     <>
-      {isViewing ? (
-        <>
-          <button onClick={handleClose} className="button">
-            Schowaj opinie
-          </button>
-          <ul className="reviews">
-            {reviews.map(({ cosmetic, review }) => (
-              <li key={review.id}>
-                <h4>
-                  {cosmetic.brand}, {cosmetic.name}
-                </h4>
-                <p>Rating: {review.rating}</p>
-                <p>{review.comment}</p>
-                <EditReview review_id={review.id} />{" "}
+      <button onClick={() => setIsModalOpen(true)} className="button">
+        Wyświetl swoje opinie
+      </button>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Twoje opinie"
+      >
+        <ul className="reviews-list">
+          {reviews.map(({ cosmetic, review }) => (
+            <li key={review.id} className="review-item">
+              <h4 className="h4">
+                {cosmetic.brand}, {cosmetic.name}
+              </h4>
+              <p className="p">Ocena: {review.rating}/5</p>
+              <p className="p">{review.comment}</p>
+              <div className="review-actions">
+                <EditReview review_id={review.id} />
                 <DeleteReview review_id={review.id} />
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : (
-        <button onClick={handleView} className="button">
-          Wyświetl swoje opinie
-        </button>
-      )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Modal>
     </>
   );
 };

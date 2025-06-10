@@ -13,7 +13,15 @@ async function login(email, password) {
         body: JSON.stringify({ email, password }),
       }
     );
-    const data = await response.json();
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (err) {
+      console.error("Failed to parse JSON from response:", err);
+      return false;
+    }
+
     if (response.ok) {
       document.cookie = `${data.access_token}`;
       localStorage.setItem("currentUserId", data.id);
@@ -21,8 +29,10 @@ async function login(email, password) {
       localStorage.setItem("currentUsername", data.user);
 
       return true;
+    } else {
+      console.error("Login failed, response:", data);
+      return false;
     }
-    return false;
   } catch (error) {
     console.error("Login error:", error);
     return false;

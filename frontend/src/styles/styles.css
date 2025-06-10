@@ -1,122 +1,277 @@
 :root {
-  --bg-color-main: rgb(255, 206, 214);
-  --bg-color-secondary: rgb(255, 168, 183);
-  --bg-color-button: rgb(255, 247, 250);
-  --border: rgb(255, 79, 108);
+  --bg-color-main: #fce4ec;
+  --bg-color-secondary: #f8bbd0;
+  --bg-color-button: #ffffff;
+  --border: #e91e63;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --shadow: rgba(0, 0, 0, 0.1);
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--bg-color-main);
-  margin: 0px;
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
 }
 
+/* Buttons */
 .button {
-  width: max-content;
-  height: max-content;
-  border: 1px solid var(--border);
-  border-radius: 5px;
+  padding: 8px 16px;
+  border: 2px solid var(--border);
+  border-radius: 20px;
   background-color: var(--bg-color-button);
-  padding: 3px;
+  color: var(--border);
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px var(--shadow);
+  margin: 5px;
 }
 
 .button:hover {
-  background-color: var(--bg-color-main);
+  background-color: var(--border);
+  color: white;
+  transform: translateY(-2px);
 }
 
+/* Login Page */
 .loginPage {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 98vh;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(
+    135deg,
+    var(--bg-color-main),
+    var(--bg-color-secondary)
+  );
 }
 
 .logIn,
 .signUp {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--bg-color-secondary);
-  padding: 0 20px 20px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-
-  p {
-    margin-bottom: 15px;
-  }
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px var(--shadow);
+  width: 100%;
+  max-width: 400px;
+  margin: 10px 0;
 }
 
 .input {
-  margin-bottom: 10px;
-  border-radius: 5px;
-  border: 1px solid var(--border);
-  padding: 3px;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid var(--bg-color-secondary);
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
 }
 
-.logIn {
+.input:focus {
+  border-color: var(--border);
+  outline: none;
+}
+
+/* Header */
+.header {
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
-.header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.h1 {
+  color: var(--border);
+  text-align: center;
+  font-size: 2.5em;
+  margin: 20px 0;
+}
 
-  .nav {
-    align-self: flex-end;
-    margin: 10px 10px 0 0;
+/* Main Content */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-    .button {
-      margin-left: 5px;
-      padding: 4px;
-    }
-  }
-
-  .h1 {
-    margin-top: 0px;
-    color: rgb(205, 87, 126);
-  }
+.ul {
+  list-style: none;
+  padding: 0;
 }
 
 .li {
-  .p {
-    margin-bottom: 5px;
-  }
-
-  .button {
-    margin-right: 8px;
-    background-color: var(--bg-color-button);
-  }
+  background-color: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--shadow);
 }
 
-.main {
-  margin-left: 15px;
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
 }
 
+/* Forms */
 .addCosmetic,
 .newReview,
 .edit,
 .editCosmetic {
-  width: 400px;
-  height: min-content;
-  border: 1px solid var(--border);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px var(--shadow);
+  margin: 20px auto;
+  max-width: 500px;
+}
 
+/* Error Message */
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px 0;
+  border-left: 4px solid #c62828;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .button {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  .main {
+    padding: 10px;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loginPage > * {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Search Bar */
+.searchBar {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  position: relative;
+}
+
+.searchBar input {
+  width: 100%;
+  padding: 15px;
+  border-radius: 25px;
+  border: 2px solid var(--bg-color-secondary);
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.searchBar input:focus {
+  border-color: var(--border);
+  box-shadow: 0 0 8px var(--shadow);
+}
+
+/* Modal/Popup styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  z-index: 1000;
+}
 
-  button {
-    align-self: flex-end;
-  }
+.modal {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  position: relative;
+  width: 90%;
+  max-width: 500px;
+  animation: modalFadeIn 0.3s ease-out;
+}
 
-  button:first-of-type {
-    height: 20px;
-    width: 20px;
-  }
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
 
-  input {
-    width: 200px;
-    margin-bottom: px;
+.modal-close:hover {
+  color: var(--border);
+}
+
+.modal-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--border);
+  padding-right: 30px;
+}
+
+.modal-content {
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Prevent scrolling when modal is open */
+body.modal-open {
+  overflow: hidden;
 }

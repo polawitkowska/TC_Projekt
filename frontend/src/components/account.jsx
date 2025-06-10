@@ -1,6 +1,7 @@
 import React from "react";
 import { ViewProfile, Edit, Add } from "./buttons";
 import { ViewReviewsOfUser, ViewReviewsOfCosmetic, AddReview } from "./reviews";
+import { Modal } from "./Modal";
 import { SearchBar } from "./search";
 
 const token = document.cookie;
@@ -10,94 +11,63 @@ const getCurrentUsername = () => localStorage.getItem("currentUsername");
 
 //edytowanie konta
 const EditAccount = () => {
-  const currentUserId = getCurrentId();
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const currentEmail = getCurrentEmail();
   const currentUsername = getCurrentUsername();
-  const [isEditing, setIsEditing] = React.useState(false);
   const [newEmail, setNewEmail] = React.useState(`${currentEmail}`);
   const [newUsername, setNewUsername] = React.useState(`${currentUsername}`);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  async function handleSubmit(email, username) {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/${currentUserId}`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, username }),
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem("currentEmail", email);
-        localStorage.setItem("currentUsername", username);
-      }
-    } catch (error) {
-      console.error("Error editing account:", error);
-    }
-  }
-
-  const handleClose = () => {
-    setIsEditing(false);
-  };
   return (
     <>
-      {isEditing ? (
+      <button onClick={() => setIsModalOpen(true)} className="button">
+        Edytuj profil
+      </button>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Edytuj profil"
+      >
         <form
-          className="edit"
-          id="edit"
+          className="form"
           onSubmit={(event) => {
             event.preventDefault();
             handleSubmit(newEmail, newUsername);
           }}
         >
-          <button onClick={handleClose} className="button" type="button">
-            X
-          </button>
           <input
+            className="input"
             type="email"
-            name="email"
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
-            placeholder="Podaj nowy email"
+            placeholder="Nowy email"
           />
           <input
+            className="input"
             type="text"
-            name="username"
             value={newUsername}
             onChange={(e) => setNewUsername(e.target.value)}
-            placeholder="Podaj nową nazwę użytkownika"
+            placeholder="Nowa nazwa użytkownika"
           />
-          <button className="button" type="submit">
-            Zapisz zmiany
-          </button>
+          <div className="modal-actions">
+            <button className="button" type="submit">
+              Zapisz zmiany
+            </button>
+          </div>
         </form>
-      ) : (
-        <button onClick={handleEdit} className="button">
-          Edytuj profil
-        </button>
-      )}
+      </Modal>
     </>
   );
 };
 
 const DeleteAccount = () => {
-  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [password, setPassword] = React.useState("");
 
   async function handleDelete() {
-    const currentUserId = getCurrentId();
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/${currentUserId}`,
+        `${process.env.REACT_APP_API_URL}/users/${getCurrentId()}`,
         {
           method: "DELETE",
           headers: {
@@ -111,53 +81,51 @@ const DeleteAccount = () => {
       if (response.ok) {
         localStorage.clear();
         window.location.href = "/";
-      } else {
-        console.log("Password incorrect");
       }
     } catch (error) {
       console.error("Error deleting account:", error);
     }
   }
 
-  const handleConfirmDelete = () => {
-    setIsDeleting(true);
-  };
-
-  const handleCancel = () => {
-    setIsDeleting(false);
-    setPassword("");
-  };
-
   return (
     <>
-      {isDeleting ? (
+      <button onClick={() => setIsModalOpen(true)} className="button">
+        Usuń konto
+      </button>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Usuń konto"
+      >
         <form
-          className="delete"
-          id="delete"
+          className="form"
           onSubmit={(event) => {
             event.preventDefault();
             handleDelete();
           }}
         >
           <input
+            className="input"
             type="password"
-            name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Podaj hasło"
+            placeholder="Potwierdź hasłem"
           />
-          <button className="button" type="submit">
-            Potwierdź usunięcie
-          </button>
-          <button onClick={handleCancel} className="button" type="button">
-            Anuluj usunięcie
-          </button>
+          <div className="modal-actions">
+            <button
+              className="button"
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Anuluj
+            </button>
+            <button className="button" type="submit">
+              Usuń konto
+            </button>
+          </div>
         </form>
-      ) : (
-        <button onClick={handleConfirmDelete} className="button">
-          Usuń konto
-        </button>
-      )}
+      </Modal>
     </>
   );
 };
@@ -180,12 +148,14 @@ const Logout = () => {
 
 //usuwanie kosmetyku z zapisanych
 const RemoveCosmetic = ({ cosmetic_id }) => {
-  const currentUserId = getCurrentId();
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   async function handleRemove() {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/${currentUserId}/cosmetics/${cosmetic_id}/saved`,
+        `${
+          process.env.REACT_APP_API_URL
+        }/users/${getCurrentId()}/cosmetics/${cosmetic_id}/saved`,
         {
           method: "DELETE",
           headers: {
@@ -195,9 +165,9 @@ const RemoveCosmetic = ({ cosmetic_id }) => {
         }
       );
 
-      const data = await response.json();
       if (response.ok) {
-        console.log("Cosmetic removed");
+        setIsModalOpen(false);
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error removing cosmetic:", error);
@@ -206,9 +176,25 @@ const RemoveCosmetic = ({ cosmetic_id }) => {
 
   return (
     <>
-      <button className="button" onClick={handleRemove}>
+      <button className="button" onClick={() => setIsModalOpen(true)}>
         Usuń produkt
       </button>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Usuń produkt"
+      >
+        <p>Czy na pewno chcesz usunąć ten produkt z zapisanych?</p>
+        <div className="modal-actions">
+          <button className="button" onClick={() => setIsModalOpen(false)}>
+            Anuluj
+          </button>
+          <button className="button" onClick={handleRemove}>
+            Usuń
+          </button>
+        </div>
+      </Modal>
     </>
   );
 };
@@ -247,7 +233,6 @@ const Account = ({ cosmetics, error }) => {
             </li>
           ))}
         </ul>
-
         <Add />
       </main>
       {error && <div className="error">{error}</div>}
