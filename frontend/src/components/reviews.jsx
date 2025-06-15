@@ -257,13 +257,13 @@ const ViewReviewsOfUser = () => {
   return (
     <>
       <button onClick={() => setIsModalOpen(true)} className="button">
-        Wyświetl swoje opinie
+        Wyświetl swoje recenzje
       </button>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Twoje opinie"
+        title="Twoje recenzje"
       >
         {reviews.length > 0 ? (
           <ul className="reviews-list">
@@ -282,7 +282,7 @@ const ViewReviewsOfUser = () => {
             ))}
           </ul>
         ) : (
-          <p className="p">You haven't posted any reviews</p>
+          <p className="p">Nie masz żadnych recenzji</p>
         )}
       </Modal>
     </>

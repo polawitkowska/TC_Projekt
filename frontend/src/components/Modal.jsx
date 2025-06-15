@@ -1,13 +1,14 @@
 import React from "react";
 
 const Modal = ({ isOpen, onClose, title, children }) => {
-  if (!isOpen) return null;
-
   React.useEffect(() => {
-    document.body.classList.add("modal-open");
-    return () => document.body.classList.remove("modal-open");
-  }, []);
+    if (isOpen) {
+      document.body.classList.add("modal-open");
+      return () => document.body.classList.remove("modal-open");
+    }
+  }, [isOpen]);
 
+  if (!isOpen) return null;
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>

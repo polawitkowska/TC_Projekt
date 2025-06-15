@@ -10,77 +10,77 @@ const currentEmail = localStorage.getItem("currentEmail");
 const currentUsername = localStorage.getItem("currentUsername");
 
 //edytowanie konta
-const EditAccount = () => {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [newEmail, setNewEmail] = React.useState(`${currentEmail}`);
-  const [newUsername, setNewUsername] = React.useState(`${currentUsername}`);
+// const EditAccount = () => {
+//   const [isModalOpen, setIsModalOpen] = React.useState(false);
+//   const [newEmail, setNewEmail] = React.useState(`${currentEmail}`);
+//   const [newUsername, setNewUsername] = React.useState(`${currentUsername}`);
 
-  return (
-    <>
-      <button onClick={() => setIsModalOpen(true)} className="button">
-        Edytuj profil
-      </button>
+//   return (
+//     <>
+//       <button onClick={() => setIsModalOpen(true)} className="button">
+//         Edytuj profil
+//       </button>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Edytuj profil"
-      >
-        <form
-          className="form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleSubmit(newEmail, newUsername);
-          }}
-        >
-          <input
-            className="input"
-            type="email"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-            placeholder="Nowy email"
-          />
-          <input
-            className="input"
-            type="text"
-            value={newUsername}
-            onChange={(e) => setNewUsername(e.target.value)}
-            placeholder="Nowa nazwa użytkownika"
-          />
-          <div className="modal-actions">
-            <button className="button" type="submit">
-              Zapisz zmiany
-            </button>
-          </div>
-        </form>
-      </Modal>
-    </>
-  );
-};
+//       <Modal
+//         isOpen={isModalOpen}
+//         onClose={() => setIsModalOpen(false)}
+//         title="Edytuj profil"
+//       >
+//         <form
+//           className="form"
+//           onSubmit={(event) => {
+//             event.preventDefault();
+//             handleSubmit(newEmail, newUsername);
+//           }}
+//         >
+//           <input
+//             className="input"
+//             type="email"
+//             value={newEmail}
+//             onChange={(e) => setNewEmail(e.target.value)}
+//             placeholder="Nowy email"
+//           />
+//           <input
+//             className="input"
+//             type="text"
+//             value={newUsername}
+//             onChange={(e) => setNewUsername(e.target.value)}
+//             placeholder="Nowa nazwa użytkownika"
+//           />
+//           <div className="modal-actions">
+//             <button className="button" type="submit">
+//               Zapisz zmiany
+//             </button>
+//           </div>
+//         </form>
+//       </Modal>
+//     </>
+//   );
+// };
 
-async function handleSubmit(email, username) {
-  try {
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/users/${currentUserId}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, username }),
-      }
-    );
+// async function handleSubmit(email, username) {
+//   try {
+//     const response = await fetch(
+//       `${process.env.REACT_APP_API_URL}/users/${currentUserId}`,
+//       {
+//         method: "PATCH",
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ email, username }),
+//       }
+//     );
 
-    const data = await response.json();
-    if (response.ok) {
-      localStorage.setItem("currentEmail", email);
-      localStorage.setItem("currentUsername", username);
-    }
-  } catch (error) {
-    console.error("Error editing account:", error);
-  }
-}
+//     const data = await response.json();
+//     if (response.ok) {
+//       localStorage.setItem("currentEmail", email);
+//       localStorage.setItem("currentUsername", username);
+//     }
+//   } catch (error) {
+//     console.error("Error editing account:", error);
+//   }
+// }
 
 const DeleteAccount = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -175,9 +175,7 @@ const RemoveCosmetic = ({ cosmetic_id }) => {
   async function handleRemove() {
     try {
       const response = await fetch(
-        `${
-          process.env.REACT_APP_API_URL
-        }/users/${getCurrentId()}/cosmetics/${cosmetic_id}/saved`,
+        `${process.env.REACT_APP_API_URL}/users/${currentUserId}/cosmetics/${cosmetic_id}/saved`,
         {
           method: "DELETE",
           headers: {
@@ -229,7 +227,7 @@ const Account = ({ cosmetics, error }) => {
         <nav className="nav">
           <ViewProfile />
           <ViewReviewsOfUser />
-          <EditAccount />
+          {/* <EditAccount /> */}
           <DeleteAccount />
           <Logout />
         </nav>
@@ -262,5 +260,5 @@ const Account = ({ cosmetics, error }) => {
   );
 };
 
-export { EditAccount, DeleteAccount, Logout, RemoveCosmetic };
+export { DeleteAccount, Logout, RemoveCosmetic };
 export default Account;
