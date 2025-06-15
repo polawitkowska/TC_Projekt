@@ -220,11 +220,31 @@ const ViewReviewsOfUser = () => {
 
       const data = await response.json();
       if (response.ok) {
-        const reviewsWithCosmetics = await fetchCosmetic(data);
-        setReviews(reviewsWithCosmetics);
+        if (data.message !== "User doesn't have any reviews") {
+          const cosmeticWithReview = await fetchCosmetic(data);
+          setReviews(cosmeticWithReview);
+        }
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
+    }
+  }
+
+  async function fetchCosmetic(passedReviews) {
+    try {
+      const results = await Promise.all(
+        passedReviews.map(async (review) => {
+          const response = await fetch(
+            `${process.env.REACT_APP_API_URL}/cosmetics/${review.cosmetic_id}`,
+            { method: "GET" }
+          );
+          const cosmetic = await response.json();
+          return { cosmetic, review };
+        })
+      );
+      return results;
+    } catch (error) {
+      console.error("Error fetching cosmetic:", error);
     }
   }
 
@@ -245,21 +265,25 @@ const ViewReviewsOfUser = () => {
         onClose={() => setIsModalOpen(false)}
         title="Twoje opinie"
       >
-        <ul className="reviews-list">
-          {reviews.map(({ cosmetic, review }) => (
-            <li key={review.id} className="review-item">
-              <h4 className="h4">
-                {cosmetic.brand}, {cosmetic.name}
-              </h4>
-              <p className="p">Ocena: {review.rating}/5</p>
-              <p className="p">{review.comment}</p>
-              <div className="review-actions">
-                <EditReview review_id={review.id} />
-                <DeleteReview review_id={review.id} />
-              </div>
-            </li>
-          ))}
-        </ul>
+        {reviews.length > 0 ? (
+          <ul className="reviews-list">
+            {reviews.map(({ cosmetic, review }) => (
+              <li key={review.id} className="review-item">
+                <h4 className="h4">
+                  {cosmetic.brand}, {cosmetic.name}
+                </h4>
+                <p className="p">Ocena: {review.rating}/5</p>
+                <p className="p">{review.comment}</p>
+                <div className="review-actions">
+                  <EditReview review_id={review.id} />
+                  <DeleteReview review_id={review.id} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="p">You haven't posted any reviews</p>
+        )}
       </Modal>
     </>
   );

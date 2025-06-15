@@ -101,7 +101,7 @@ def delete_account(user_id):
 def get_user_reviews(user_id):
     reviews = Review.query.filter_by(user_id=user_id).all()
     if not reviews:
-        return jsonify({"message": "No reviews found for this user"}), 404
+        return jsonify({"message": "User doesn't have any reviews"}), 200
     
     reviews_data = [{
         "id": review.id,

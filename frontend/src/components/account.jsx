@@ -5,15 +5,13 @@ import { Modal } from "./Modal";
 import { SearchBar } from "./search";
 
 const token = document.cookie;
-const getCurrentId = () => localStorage.getItem("currentUserId");
-const getCurrentEmail = () => localStorage.getItem("currentEmail");
-const getCurrentUsername = () => localStorage.getItem("currentUsername");
+const currentUserId = localStorage.getItem("currentUserId");
+const currentEmail = localStorage.getItem("currentEmail");
+const currentUsername = localStorage.getItem("currentUsername");
 
 //edytowanie konta
 const EditAccount = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const currentEmail = getCurrentEmail();
-  const currentUsername = getCurrentUsername();
   const [newEmail, setNewEmail] = React.useState(`${currentEmail}`);
   const [newUsername, setNewUsername] = React.useState(`${currentUsername}`);
 
@@ -60,6 +58,30 @@ const EditAccount = () => {
   );
 };
 
+async function handleSubmit(email, username) {
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/users/${currentUserId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, username }),
+      }
+    );
+
+    const data = await response.json();
+    if (response.ok) {
+      localStorage.setItem("currentEmail", email);
+      localStorage.setItem("currentUsername", username);
+    }
+  } catch (error) {
+    console.error("Error editing account:", error);
+  }
+}
+
 const DeleteAccount = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [password, setPassword] = React.useState("");
@@ -67,7 +89,7 @@ const DeleteAccount = () => {
   async function handleDelete() {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/${getCurrentId()}`,
+        `${process.env.REACT_APP_API_URL}/users/${currentUserId}`,
         {
           method: "DELETE",
           headers: {
