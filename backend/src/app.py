@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from models import db
@@ -9,7 +9,6 @@ from logger import get_logger
 import os
 from dotenv import load_dotenv
 import traceback
-import json
 
 load_dotenv()
 jwt_secret_key=os.getenv("jwt_secret_key")
@@ -47,7 +46,7 @@ def log_response_info(response):
 def log_exception(error):
     trace = traceback.format_exc()
     logger.error(f"Exception occurred: {error}\n{trace}")
-    return json.jsonify({"error": str(error), "trace": trace}), 500
+    return jsonify({"error": str(error), "trace": trace}), 500
 
 if __name__ == '__main__':
     with app.app_context():
