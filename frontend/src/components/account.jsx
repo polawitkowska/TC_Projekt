@@ -3,26 +3,23 @@ import { ViewProfile, Edit, Add } from "./buttons";
 import { ViewReviewsOfUser, ViewReviewsOfCosmetic, AddReview } from "./reviews";
 import { Modal } from "./Modal";
 import { SearchBar } from "./search";
+import keycloak from "../keycloak";
 
-const getTokenFromCookie = () => {
-  const cookies = document.cookie.split(";");
-  for (let cookie of cookies) {
-    const [name, value] = cookie.trim().split("=");
-    if (name === "token") {
-      return value;
-    }
-  }
-  return null;
+const getKeycloakToken = () => {
+  return keycloak.token || null;
 };
 
-const currentEmail = localStorage.getItem("currentEmail");
-const currentUsername = localStorage.getItem("currentUsername");
+const getCurrentEmail = () => localStorage.getItem("currentEmail");
+const getCurrentUsername = () => localStorage.getItem("currentUsername");
+const getCurrentUserId = () => localStorage.getItem("currentUserId");
 
 // edytowanie konta
 const EditAccount = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [newEmail, setNewEmail] = React.useState(`${currentEmail}`);
-  const [newUsername, setNewUsername] = React.useState(`${currentUsername}`);
+  const [newEmail, setNewEmail] = React.useState(getCurrentEmail() || "");
+  const [newUsername, setNewUsername] = React.useState(
+    getCurrentUsername() || ""
+  );
 
   return (
     <>
@@ -69,7 +66,7 @@ const EditAccount = () => {
 
 async function handleSubmit(email, username) {
   try {
-    const token = getTokenFromCookie();
+    const token = getKeycloakToken();
     const currentUserId = localStorage.getItem("currentUserId");
 
     const response = await fetch(
@@ -97,10 +94,9 @@ async function handleSubmit(email, username) {
 const DeleteAccount = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [password, setPassword] = React.useState("");
-
   async function handleDelete() {
     try {
-      const token = getTokenFromCookie();
+      const token = getKeycloakToken();
       const currentUserId = localStorage.getItem("currentUserId");
 
       const response = await fetch(
@@ -172,9 +168,9 @@ const Logout = () => {
   return (
     <button
       onClick={() => {
-        document.cookie = ``;
-        localStorage.clear();
-        window.location.reload();
+        keycloak.logout({
+          redirectUri: window.location.origin,
+        });
       }}
       className="button"
     >
@@ -189,7 +185,7 @@ const RemoveCosmetic = ({ cosmetic_id }) => {
 
   async function handleRemove() {
     try {
-      const token = getTokenFromCookie();
+      const token = getKeycloakToken();
       const currentUserId = localStorage.getItem("currentUserId");
 
       const response = await fetch(

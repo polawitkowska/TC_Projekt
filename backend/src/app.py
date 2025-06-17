@@ -1,17 +1,14 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager
 from models import db
 from routes.users import users_bp
 from routes.cosmetics import cosmetics_bp
-from datetime import timedelta
 from logger import get_logger
 import os
 from dotenv import load_dotenv
 import traceback
 
 load_dotenv()
-jwt_secret_key=os.getenv("jwt_secret_key")
 
 app = Flask(__name__)
 logger = get_logger()
@@ -19,16 +16,12 @@ logger = get_logger()
 CORS(app,
      origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.49.2:30001", "*"],
      supports_credentials=True)
-     
-app.config['JWT_SECRET_KEY'] = jwt_secret_key
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@db:5432/cosmetics'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5434/cosmetics'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
-jwt = JWTManager(app)
 
 app.register_blueprint(users_bp)
 app.register_blueprint(cosmetics_bp)

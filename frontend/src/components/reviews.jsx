@@ -1,29 +1,22 @@
 import React from "react";
 import { Modal } from "./Modal";
+import keycloak from "../keycloak";
 
-const getTokenFromCookie = () => {
-  const cookies = document.cookie.split(";");
-  for (let cookie of cookies) {
-    const [name, value] = cookie.trim().split("=");
-    if (name === "token") {
-      return value;
-    }
-  }
-  return null;
+const getKeycloakToken = () => {
+  return keycloak.token || null;
 };
 
-const currentUserId = localStorage.getItem("currentUserId");
+const getCurrentUserId = () => localStorage.getItem("currentUserId");
 
 //logika dodawania recenzji
 const AddReview = ({ cosmetic_id }) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [rating, setRating] = React.useState("");
   const [comment, setComment] = React.useState("");
-
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const token = getTokenFromCookie();
+      const token = getKeycloakToken();
 
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/cosmetics/${cosmetic_id}/reviews`,
@@ -122,11 +115,11 @@ const EditReview = ({ review_id }) => {
       fetchReview();
     }
   }, [isEditing, review_id]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = getTokenFromCookie();
+      const token = getKeycloakToken();
+      const currentUserId = getCurrentUserId();
 
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/users/${currentUserId}/reviews/${review_id}`,
@@ -192,7 +185,8 @@ const EditReview = ({ review_id }) => {
 const DeleteReview = ({ review_id }) => {
   const handleDelete = async () => {
     try {
-      const token = getTokenFromCookie();
+      const token = getKeycloakToken();
+      const currentUserId = getCurrentUserId();
 
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/users/${currentUserId}/reviews/${review_id}`,
@@ -226,9 +220,14 @@ const DeleteReview = ({ review_id }) => {
 const ViewReviewsOfUser = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [reviews, setReviews] = React.useState([]);
-
   async function fetchReviews() {
     try {
+      const currentUserId = getCurrentUserId();
+      if (!currentUserId) {
+        console.error("No user ID available");
+        return;
+      }
+
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/users/${currentUserId}/reviews`,
         { method: "GET" }

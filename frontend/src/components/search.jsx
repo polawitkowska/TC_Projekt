@@ -1,23 +1,17 @@
 import React from "react";
 import { AddReview } from "./reviews";
 import { Edit } from "./buttons";
+import keycloak from "../keycloak";
 
-const getTokenFromCookie = () => {
-  const cookies = document.cookie.split(";");
-  for (let cookie of cookies) {
-    const [name, value] = cookie.trim().split("=");
-    if (name === "token") {
-      return value;
-    }
-  }
-  return null;
+const getKeycloakToken = () => {
+  return keycloak.token || null;
 };
 
 //zapisywanie kosmetyku
 const SaveCosmetic = ({ cosmetic_id }) => {
   async function handleAdd() {
     try {
-      const token = getTokenFromCookie();
+      const token = getKeycloakToken();
 
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/cosmetics/${cosmetic_id}/save`,

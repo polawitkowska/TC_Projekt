@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models import Cosmetic, Review, User, db
 from sqlalchemy import or_
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from keycloak_validator import keycloak_required, get_current_user_id
 
 cosmetics_bp = Blueprint('cosmetics', __name__)
 
@@ -50,9 +50,9 @@ def update_cosmetic(cosmetic_id):
     return jsonify({"message": "Cosmetic updated", "id": cosmetic.id, "name": cosmetic.name, "brand": cosmetic.brand, "category": cosmetic.category})
 
 @cosmetics_bp.route('/cosmetics/<cosmetic_id>/reviews', methods=['POST'])
-@jwt_required()
+@keycloak_required
 def post_review(cosmetic_id):
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
     data = request.get_json()
 
     if not data.get('rating'):
@@ -80,9 +80,9 @@ def get_cosmetic_reviews(cosmetic_id):
     return jsonify(reviews_data), 200
 
 @cosmetics_bp.route('/cosmetics/<cosmetic_id>/save', methods=["POST"])
-@jwt_required()
+@keycloak_required
 def save_cosmetic(cosmetic_id):
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
     user = User.query.get(current_user_id)
     cosmetic = Cosmetic.query.get(cosmetic_id)
 

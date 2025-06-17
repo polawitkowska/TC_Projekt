@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from models import User, Review, Cosmetic, db
 from flask_cors import CORS
+from keycloak_validator import keycloak_required, get_current_user_id
 
 users_bp = Blueprint('users', __name__)
-CORS(users_bp, origins=["http://localhost:3000", "http://127.0.0.1:3000"], supports_credentials=True)
+CORS(users_bp, origins=["http://localhost:3000", "http://127.0.0.1:3000", "*"], supports_credentials=True)
 
 @users_bp.route('/users', methods=['POST'])
 def create_user():
@@ -20,20 +20,7 @@ def create_user():
 
 @users_bp.route('/users/login', methods=['POST'])
 def login():
-    data = request.get_json()
-
-    if not data.get('email') or not data.get('password'):
-        return jsonify({"error": "Missing required fields"}), 400
-    
-    user = User.query.filter_by(email=data['email']).first()
-
-    if user and user.check_password(data['password']):
-        access_token = create_access_token(identity=str(user.id))
-
-        return jsonify({"message": "Login OK", "access_token": access_token, "user": user.username, "id": user.id, "email": user.email}), 200
-
-    else:
-        return jsonify({"message": "Invalid email or password"}), 401
+    return jsonify({"message": "Please use Keycloak for authentication"}), 410
 
 @users_bp.route('/users/<user_id>', methods=['GET'])
 def get_user_by_id(user_id):
@@ -44,9 +31,9 @@ def get_user_by_id(user_id):
     return jsonify({"id": user.id, "username": user.username, "email": user.email})
 
 @users_bp.route('/users/<user_id>', methods=['PATCH'])
-@jwt_required()
+@keycloak_required
 def update_user(user_id):
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
     user = User.query.get(user_id)
     data = request.get_json()
 
@@ -74,9 +61,9 @@ def update_user(user_id):
     return jsonify({"message": "User data updated", "id": user.id, "username": user.username, "email": user.email}), 200
 
 @users_bp.route('/users/<user_id>', methods=['DELETE'])
-@jwt_required()
+@keycloak_required
 def delete_account(user_id):
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
     user = User.query.get(user_id)
     reviews_of_user = Review.query.filter_by(user_id=user_id).all()
 
@@ -122,9 +109,9 @@ def get_review_by_id(review_id):
     return jsonify({"message": "Review found", "id": review.id, "rating": review.rating, "comment": review.comment, "user_id": review.user_id, "cosmetic_id": review.cosmetic_id})
 
 @users_bp.route('/users/<user_id>/reviews/<review_id>', methods=['PATCH'])
-@jwt_required()
+@keycloak_required
 def edit_review(user_id, review_id):
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
     user = User.query.get(user_id)
 
     review = Review.query.get(review_id)
@@ -145,9 +132,9 @@ def edit_review(user_id, review_id):
     return jsonify({"message": "Review updated successfully"}), 200
 
 @users_bp.route('/users/<user_id>/reviews/<review_id>', methods=['DELETE'])
-@jwt_required()
+@keycloak_required
 def delete_reviews_user(user_id, review_id):
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
     user = User.query.get(user_id)
 
     reviews_of_user = Review.query.filter_by(user_id=user_id).all()
@@ -165,9 +152,9 @@ def delete_reviews_user(user_id, review_id):
     return jsonify({"message": f"Review of id {review_id} deleted."}), 200
 
 @users_bp.route('/users/<user_id>/saved_cosmetics', methods=["GET"])
-@jwt_required()
+@keycloak_required
 def get_saved_cosmetics(user_id):
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
     user = User.query.get(user_id)
 
     if not user:
@@ -187,9 +174,9 @@ def get_saved_cosmetics(user_id):
     return jsonify(saved_cosmetics_data), 200
 
 @users_bp.route('/users/<user_id>/cosmetics/<cosmetic_id>/saved', methods=["DELETE"])
-@jwt_required()
+@keycloak_required
 def delete_saved_cosmetic(user_id, cosmetic_id):
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
     user = User.query.get(user_id)
     cosmetic = Cosmetic.query.get(cosmetic_id)
 
@@ -212,4 +199,23 @@ def delete_saved_cosmetic(user_id, cosmetic_id):
             "name": cosmetic.name,
             "brand": cosmetic.brand
         }
+    }), 200
+
+@users_bp.route('/users/me', methods=['GET'])
+@keycloak_required
+def get_current_user():
+    """Get current user information based on Keycloak token"""
+    current_user_id = get_current_user_id()
+    
+    if not current_user_id:
+        return jsonify({"error": "User not found"}), 404
+    
+    user = User.query.get(current_user_id)
+    if not user:
+        return jsonify({"error": "User not found in database"}), 404
+    
+    return jsonify({
+        "id": user.id,
+        "username": user.username,
+        "email": user.email
     }), 200
