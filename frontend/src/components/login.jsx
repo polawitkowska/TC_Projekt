@@ -21,9 +21,9 @@ async function login(email, password) {
       console.error("Failed to parse JSON from response:", err);
       return false;
     }
-
     if (response.ok) {
-      document.cookie = `${data.access_token}`;
+      document.cookie = `token=${data.access_token}; path=/; secure; samesite=strict`;
+
       localStorage.setItem("currentUserId", data.id);
       localStorage.setItem("currentEmail", data.email);
       localStorage.setItem("currentUsername", data.user);

@@ -2,7 +2,18 @@ import React from "react";
 import { AddReview } from "./reviews";
 import { Edit } from "./buttons";
 
-const token = document.cookie;
+const getTokenFromCookie = () => {
+  const cookies = document.cookie.split(";");
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split("=");
+    if (name === "token") {
+      return value;
+    }
+  }
+  return null;
+};
+
+const token = getTokenFromCookie();
 
 //zapisywanie kosmetyku
 const SaveCosmetic = ({ cosmetic_id }) => {

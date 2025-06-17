@@ -5,9 +5,21 @@ import LoginForm from "./components/login";
 
 const getCurrentUser = () => localStorage.getItem("currentUserId");
 
+// Function to extract token from cookies
+const getTokenFromCookie = () => {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'token') {
+      return value;
+    }
+  }
+  return null;
+};
+
 async function fetchCosmetics() {
   try {
-    const token = document.cookie;
+    const token = getTokenFromCookie();
     const current_user = getCurrentUser();
     const response = await fetch(
       `${process.env.REACT_APP_API_URL}/users/${current_user}/saved_cosmetics`,

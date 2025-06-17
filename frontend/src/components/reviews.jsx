@@ -1,8 +1,19 @@
 import React from "react";
 import { Modal } from "./Modal";
 
-const token = document.cookie;
+const getTokenFromCookie = () => {
+  const cookies = document.cookie.split(";");
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split("=");
+    if (name === "token") {
+      return value;
+    }
+  }
+  return null;
+};
+
 const currentUserId = localStorage.getItem("currentUserId");
+const token = getTokenFromCookie();
 
 //logika dodawania recenzji
 const AddReview = ({ cosmetic_id }) => {
@@ -21,7 +32,10 @@ const AddReview = ({ cosmetic_id }) => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ rating: Number(rating), comment }),
+          body: JSON.stringify({
+            rating: parseInt(rating),
+            comment: comment.trim(),
+          }),
         }
       );
 
@@ -126,8 +140,8 @@ const EditReview = ({ review_id }) => {
         }
       );
 
-      const data = await response.json();
       if (response.ok) {
+        const data = await response.json();
         console.log(data);
         setIsEditing(false);
       }
@@ -192,7 +206,9 @@ const DeleteReview = ({ review_id }) => {
       if (response.ok) {
         console.log("Review deleted successfully");
       } else {
-        console.error("Failed to delete review");
+        const errorData = await response.json();
+        console.error("Failed to delete review:", errorData);
+        alert(`Błąd: ${errorData.message || "Nie udało się usunąć opinii"}`);
       }
     } catch (error) {
       console.error("Error deleting review:", error);
