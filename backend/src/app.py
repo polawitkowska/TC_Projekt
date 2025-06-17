@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from models import db
@@ -9,7 +9,6 @@ from logger import get_logger
 import os
 from dotenv import load_dotenv
 import traceback
-import json
 
 load_dotenv()
 jwt_secret_key=os.getenv("jwt_secret_key")
@@ -18,7 +17,7 @@ app = Flask(__name__)
 logger = get_logger()
 
 CORS(app,
-     origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+     origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.49.2:30001", "*"],
      supports_credentials=True)
      
 app.config['JWT_SECRET_KEY'] = jwt_secret_key
@@ -34,6 +33,10 @@ jwt = JWTManager(app)
 app.register_blueprint(users_bp)
 app.register_blueprint(cosmetics_bp)
 
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "healthy", "message": "Backend is running"}), 200
+
 @app.before_request
 def log_request_info():
     logger.info(f'Request: {request.method} {request.path} from {request.remote_addr}')
@@ -47,7 +50,7 @@ def log_response_info(response):
 def log_exception(error):
     trace = traceback.format_exc()
     logger.error(f"Exception occurred: {error}\n{trace}")
-    return json.jsonify({"error": str(error), "trace": trace}), 500
+    return jsonify({"error": str(error), "trace": trace}), 500
 
 if __name__ == '__main__':
     with app.app_context():

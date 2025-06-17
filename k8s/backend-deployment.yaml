@@ -24,6 +24,5 @@ spec:
                 configMapKeyRef:
                   name: app-config
                   key: DATABASE_URL
-          envFrom:
-            - configMapRef:
-                name: app-config
+            - name: CORS_ORIGINS
+              value: "*"

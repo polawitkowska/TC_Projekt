@@ -41,7 +41,12 @@ async function login(email, password) {
 
 //logika zakładania konta
 async function signup(email, username, password) {
+  console.log("API URL:", process.env.REACT_APP_API_URL);
   try {
+    console.log(
+      "Sending request to:",
+      `${process.env.REACT_APP_API_URL}/users`
+    );
     const response = await fetch(`${process.env.REACT_APP_API_URL}/users`, {
       method: "POST",
       headers: {
@@ -50,6 +55,7 @@ async function signup(email, username, password) {
       body: JSON.stringify({ email, username, password }),
     });
 
+    console.log("Response status:", response.status);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Signup failed");
