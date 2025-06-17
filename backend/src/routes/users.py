@@ -55,13 +55,13 @@ def update_user(user_id):
     
     if current_user_id == user_id:
         if 'username' in data:
-            isAlreadyTaken = User.query.get(data['username'])
-            if isAlreadyTaken:
+            existing_user = User.query.filter_by(username=data['username']).first()
+            if existing_user and existing_user.id != user.id:
                 return jsonify({"error": "Username already taken"}), 403
             user.username = data['username']
         if 'email' in data:
-            isAlreadyTaken = User.query.get(data['email'])
-            if isAlreadyTaken:
+            existing_user = User.query.filter_by(email=data['email']).first()
+            if existing_user and existing_user.id != user.id:
                 return jsonify({"error": "Email already taken"}), 403
             user.email = data['email']
         if 'password' in data:

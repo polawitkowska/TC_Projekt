@@ -2,12 +2,23 @@ import React from "react";
 import { AddReview } from "./reviews";
 import { Edit } from "./buttons";
 
-const token = document.cookie;
+const getTokenFromCookie = () => {
+  const cookies = document.cookie.split(";");
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split("=");
+    if (name === "token") {
+      return value;
+    }
+  }
+  return null;
+};
 
 //zapisywanie kosmetyku
 const SaveCosmetic = ({ cosmetic_id }) => {
   async function handleAdd() {
     try {
+      const token = getTokenFromCookie();
+
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/cosmetics/${cosmetic_id}/save`,
         {

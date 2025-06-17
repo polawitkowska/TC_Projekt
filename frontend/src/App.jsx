@@ -5,10 +5,32 @@ import LoginForm from "./components/login";
 
 const getCurrentUser = () => localStorage.getItem("currentUserId");
 
+const getTokenFromCookie = () => {
+  const cookies = document.cookie.split(";");
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split("=");
+    if (name === "token") {
+      return value;
+    }
+  }
+  return null;
+};
+
 async function fetchCosmetics() {
   try {
-    const token = document.cookie;
+    const token = getTokenFromCookie();
     const current_user = getCurrentUser();
+
+    if (!token) {
+      console.log("No token found");
+      return [];
+    }
+
+    if (!current_user) {
+      console.log("No current user found");
+      return [];
+    }
+
     const response = await fetch(
       `${process.env.REACT_APP_API_URL}/users/${current_user}/saved_cosmetics`,
       {
@@ -19,12 +41,16 @@ async function fetchCosmetics() {
         },
       }
     );
-    const data = await response.json();
+
     if (response.ok) {
-      return data;
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+    } else {
+      console.error("Failed to fetch cosmetics:", response.status);
+      return [];
     }
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching cosmetics:", error);
     return [];
   }
 }

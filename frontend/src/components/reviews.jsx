@@ -1,7 +1,17 @@
 import React from "react";
 import { Modal } from "./Modal";
 
-const token = document.cookie;
+const getTokenFromCookie = () => {
+  const cookies = document.cookie.split(";");
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split("=");
+    if (name === "token") {
+      return value;
+    }
+  }
+  return null;
+};
+
 const currentUserId = localStorage.getItem("currentUserId");
 
 //logika dodawania recenzji
@@ -13,6 +23,8 @@ const AddReview = ({ cosmetic_id }) => {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
+      const token = getTokenFromCookie();
+
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/cosmetics/${cosmetic_id}/reviews`,
         {
@@ -114,6 +126,8 @@ const EditReview = ({ review_id }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const token = getTokenFromCookie();
+
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/users/${currentUserId}/reviews/${review_id}`,
         {
@@ -178,6 +192,8 @@ const EditReview = ({ review_id }) => {
 const DeleteReview = ({ review_id }) => {
   const handleDelete = async () => {
     try {
+      const token = getTokenFromCookie();
+
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/users/${currentUserId}/reviews/${review_id}`,
         {
@@ -301,7 +317,7 @@ const ViewReviewsOfCosmetic = ({ cosmetic_id }) => {
   async function fetchReviews(cosmetic_id) {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}//cosmetics/${cosmetic_id}/reviews`,
+        `${process.env.REACT_APP_API_URL}/cosmetics/${cosmetic_id}/reviews`,
         { method: "GET" }
       );
 
