@@ -15,7 +15,6 @@ const getTokenFromCookie = () => {
   return null;
 };
 
-const currentUserId = localStorage.getItem("currentUserId");
 const currentEmail = localStorage.getItem("currentEmail");
 const currentUsername = localStorage.getItem("currentUsername");
 
@@ -71,6 +70,7 @@ const EditAccount = () => {
 async function handleSubmit(email, username) {
   try {
     const token = getTokenFromCookie();
+    const currentUserId = localStorage.getItem("currentUserId");
 
     console.log("Sending update request with:", { email, username });
 
@@ -121,6 +121,7 @@ const DeleteAccount = () => {
   async function handleDelete() {
     try {
       const token = getTokenFromCookie();
+      const currentUserId = localStorage.getItem("currentUserId");
 
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/users/${currentUserId}`,
@@ -209,6 +210,7 @@ const RemoveCosmetic = ({ cosmetic_id }) => {
   async function handleRemove() {
     try {
       const token = getTokenFromCookie();
+      const currentUserId = localStorage.getItem("currentUserId");
 
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/users/${currentUserId}/cosmetics/${cosmetic_id}/saved`,
